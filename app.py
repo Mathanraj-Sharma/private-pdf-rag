@@ -157,7 +157,7 @@ def main():
                     full_response += chunk
                     response_placeholder.write(full_response + "▌")
                 
-                # response_placeholder.write(full_response)
+                response_placeholder.write(full_response)
                 
                 # Add assistant response to chat history
                 st.session_state.chat_history.append(("assistant", full_response))
@@ -222,6 +222,5 @@ def show_sources(query: str):
         st.error(f"Error retrieving sources: {str(e)}")
 
 
-import cProfile
 if __name__ == "__main__":
-    cProfile.run("main()", filename="./app_profile.prof")
+    main()

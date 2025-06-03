@@ -17,7 +17,7 @@ CHROMA_DB_DIR.mkdir(parents=True, exist_ok=True)
 
 # Ollama settings
 OLLAMA_BASE_URL = os.getenv("OLLAMA_BASE_URL", "http://localhost:11434")
-OLLAMA_MODEL = os.getenv("OLLAMA_MODEL", "gemma2:2b-instruct-q2_K")
+OLLAMA_MODEL = os.getenv("OLLAMA_MODEL", "h2o-danube3-500m-chat-Q4_K_M.gguf:latest")
 
 # ChromaDB settings
 CHROMA_COLLECTION_NAME = os.getenv("CHROMA_COLLECTION_NAME", "pdf_documents")

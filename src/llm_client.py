@@ -30,7 +30,7 @@ class OllamaClient:
         except Exception:
             return []
     
-    def generate_response(self, prompt: str, context: Optional[str] = None, system_prompt: Optional[str] = None) -> str:
+    def generate_response(self, prompt: str, context: Optional[str] = None, system_prompt: Optional[str] = None, **kwargs) -> str:
         """Generate response from Ollama model."""
         try:
             messages = []
@@ -62,10 +62,12 @@ class OllamaClient:
             response = self.client.chat(
                 model=self.model,
                 messages=messages,
-                options={
-                    'temperature': 0.7,
-                    'top_p': 0.9,
-                    'num_predict': 500  # equivalent to max_tokens
+                options = {
+                    'temperature': kwargs.get('temperature', 0.7),
+                    'top_p': kwargs.get('top_p', 0.9),
+                    'num_predict': kwargs.get('max_tokens', 512),
+                    'num_ctx': 4096,
+                    'num_thread': 8,
                 }
             )
             
@@ -98,6 +100,9 @@ class OllamaClient:
                 user_content = f"""User question: {prompt}
                     Please provide a helpful and friendly response."""
             
+            if len(user_content) > 4096:
+                user_content = user_content[:4096] + '... [truncated]'
+            
             messages.append({
                 'role': 'user',
                 'content': user_content
@@ -110,8 +115,8 @@ class OllamaClient:
                 options = {
                     'temperature': kwargs.get('temperature', 0.7),
                     'top_p': kwargs.get('top_p', 0.9),
-                    'num_predict': kwargs.get('max_tokens', 100),
-                    'num_ctx': kwargs.get('context_length', 2048),
+                    'num_predict': kwargs.get('max_tokens', 512),
+                    'num_ctx': 4096,
                     'num_thread': 8,
                 }
             )
