@@ -117,7 +117,8 @@ class OllamaClient:
                     'top_p': kwargs.get('top_p', 0.9),
                     'num_predict': kwargs.get('max_tokens', 512),
                     'num_ctx': 4096,
-                    'num_thread': 8,
+                    'num_thread': -1,
+                    'num_gpu': 10,
                 }
             )
             

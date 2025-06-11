@@ -1,0 +1,76 @@
+services:
+  ollama:
+    image: ollama/ollama:latest
+    ports:
+      - "11434:11434"
+    volumes:
+      - ollama_data:/root/.ollama
+      - ./hf_models:/root/hf_models
+    networks:
+        - app-network
+    restart: unless-stopped
+    runtime: nvidia
+    environment:
+      - NVIDIA_VISIBLE_DEVICES=all
+      - NVIDIA_DRIVER_CAPABILITIES=compute,utility
+
+  ollama_setup:
+    image: ollama/ollama:latest
+    volumes:
+      - ollama_data:/root/.ollama
+      - ./hf_models:/root/hf_models
+    depends_on:
+      - ollama
+    environment:
+      - OLLAMA_HOST=http://ollama:11434
+      - NVIDIA_VISIBLE_DEVICES=all
+      - NVIDIA_DRIVER_CAPABILITIES=compute,utility
+    networks:
+        - app-network
+    entrypoint: ["/bin/bash"]
+    command: |
+      -c "
+      ollama create h2o-danube3-500m-chat-Q4_K_M.gguf -f /root/hf_models/Modelfile
+      "
+    restart: no
+    runtime: nvidia
+    
+  streamlit:
+    image: python:3.11-slim
+    working_dir: /app
+    ports:
+      - "8501:8501"
+    volumes:
+      - .:/app
+    depends_on:
+      - ollama
+      - ollama_setup
+    networks:
+      - app-network
+    command: |
+      sh -c "
+      pip install uv &&
+      uv sync &&
+      cp .env.example .env &&
+      uv run streamlit run app.py
+      "
+    restart: unless-stopped
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: [gpu]
+    runtime: nvidia
+    environment:
+      - OLLAMA_HOST=http://ollama:11434
+      - NVIDIA_VISIBLE_DEVICES=all
+      - NVIDIA_DRIVER_CAPABILITIES=compute,utility
+
+volumes:
+  ollama_data:
+
+networks:
+  app-network:
+    driver: bridge

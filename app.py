@@ -10,7 +10,7 @@ sys.path.append(str(Path(__file__).parent))
 
 from src.document_processor import DocumentProcessor
 from src.rag_pipeline import RAGPipeline
-from config.settings import PAGE_TITLE, PAGE_ICON
+from config.settings import PAGE_TITLE, PAGE_ICON, OLLAMA_BASE_URL
 
 
 def init_session_state():
@@ -67,7 +67,7 @@ def main():
                 st.warning("No models found. Please pull a model first.")
         else:
             st.error("❌ Ollama Not Connected")
-            st.markdown("Make sure Ollama is running on `http://localhost:11434`")
+            st.markdown(f"Make sure Ollama is running on {OLLAMA_BASE_URL} and the model is available.")
         
         st.divider()
         
